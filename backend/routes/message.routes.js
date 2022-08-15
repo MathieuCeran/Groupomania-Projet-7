@@ -12,6 +12,7 @@ router.get("/:id", auth, multer, messageCtrl.getOneMessage);
 router.post("/", auth, multer, messageCtrl.createMessage);
 router.put("/:id", auth, multer, messageCtrl.editMessage);
 router.delete("/:id", auth, multer, messageCtrl.deleteMessage);
+router.patch("/:id", auth, multer, messageCtrl.deleteMediaMessage);
 
 //Like/Unlike
 router.post("/like/:id", auth, messageCtrl.likeMessage);

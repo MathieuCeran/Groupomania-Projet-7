@@ -132,6 +132,22 @@ exports.editMessage = async (req, res, next) => {
               res.status(200).json({ message: "Message modifié" });
             })
             .catch((error) => res.status(501).json({ message: error }));
+        } else if (
+          (ThisMessage.userId === user && req.body.texte === undefined) ||
+          (users.isAdmin === true && req.body.texte === undefined)
+        ) {
+          MessageModel.Message.update(
+            {
+              media: `${req.protocol}://${req.get("host")}/images/upload/${
+                req.file.filename
+              }`,
+            },
+            { where: { id: req.params.id } }
+          )
+            .then(() => {
+              res.status(200).json({ message: "Image modifié" });
+            })
+            .catch((error) => res.status(501).json({ message: error }));
         } else {
           res.status(401).json({ message: "Non Autorisé" });
         }
@@ -139,6 +155,40 @@ exports.editMessage = async (req, res, next) => {
       .catch((error) => {
         res.status(500).json({ error });
       });
+  });
+};
+
+//Suppression de l'image uniquement
+exports.deleteMediaMessage = async (req, res, next) => {
+  const message = await MessageModel.Message.findByPk(req.params.id);
+
+  if (!message)
+    return res
+      .status(404)
+      .send({ message: "Le message n'a pas été trouvé ou déjà supprimé" });
+
+  UserModel.User.findOne({ where: { id: req.token.userId } }).then((users) => {
+    if (!users) {
+      return res.status(401).json({ message: "pas utilisateur" });
+    }
+    MessageModel.Message.findOne({ where: { id: req.params.id } }).then(
+      (thisMessage) => {
+        const filename = thisMessage.media.split("/images/upload/")[1];
+        fs.unlink(`images/upload/${filename}`, () => {
+          console.log("Image supprimée du dossier");
+        });
+        MessageModel.Message.update(
+          {
+            media: null,
+          },
+          { where: { id: req.params.id } }
+        )
+          .then(() => {
+            res.status(200).json({ message: "Image modifié" });
+          })
+          .catch((error) => res.status(501).json({ message: error }));
+      }
+    );
   });
 };
 

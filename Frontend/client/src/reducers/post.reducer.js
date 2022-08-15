@@ -3,6 +3,8 @@ import {
   GET_POSTS,
   UNLIKE_POST,
   UPDATE_POST,
+  UPDATE_MEDIA,
+  DELETE_MEDIA,
 } from "../actions/post.actions";
 
 const initialState = {};
@@ -17,6 +19,24 @@ export default function postReducer(state = initialState, action) {
           return {
             ...post,
             texte: action.payload.texte,
+          };
+        } else return post;
+      });
+    case UPDATE_MEDIA:
+      return state.map((post) => {
+        if (post.id === action.payload.postId) {
+          return {
+            ...post,
+            media: action.payload.media,
+          };
+        } else return post;
+      });
+    case DELETE_MEDIA:
+      return state.map((post) => {
+        if (post.id === action.payload.postId) {
+          return {
+            ...post,
+            media: action.payload.media,
           };
         } else return post;
       });

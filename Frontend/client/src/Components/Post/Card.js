@@ -1,9 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getComments } from "../../actions/comment.actions";
 import { getLikes } from "../../actions/likes.actions";
-import { updatePost } from "../../actions/post.actions";
+import {
+  deleteMediaMessage,
+  getPosts,
+  updateMedia,
+  updatePost,
+} from "../../actions/post.actions";
 import { getUsers } from "../../actions/users.actions";
 import { UidContext } from "../App.Context";
 import { DateParser, isEmpty } from "../utils/Utils";
@@ -16,9 +21,11 @@ const Card = ({ post }) => {
   const [isUpdated, setIsUpdated] = useState(false);
   const [textUpdate, setTextUpdate] = useState(null);
   const [showComments, setShowComments] = useState(false);
-  const { id } = useParams();
+
   const uid = useContext(UidContext);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [mediaFront, setMediaFront] = useState(null);
+  const [media, setMedia] = useState();
 
   const usersData = useSelector((state) => state.usersReducer);
   const userData = useSelector((state) => state.userReducer);
@@ -30,6 +37,25 @@ const Card = ({ post }) => {
       dispatch(updatePost(post.id, textUpdate));
     }
     setIsUpdated(false);
+  };
+
+  const updateImg = () => {
+    const formData = new FormData();
+    formData.append("media", media);
+    dispatch(updateMedia(post.id, formData)).then(() => dispatch(getPosts()));
+    setIsUpdated(false);
+  };
+
+  const deleteImg = () => {
+    dispatch(deleteMediaMessage(post.id, media)).then(() =>
+      dispatch(getPosts())
+    );
+    setIsUpdated(false);
+  };
+
+  const handlePicture = (e) => {
+    setMediaFront(URL.createObjectURL(e.target.files[0]));
+    setMedia(e.target.files[0]);
   };
 
   useEffect(() => {
@@ -155,17 +181,72 @@ const Card = ({ post }) => {
                   />
                   <div className="button-container">
                     <button className="btn" onClick={updateItem}>
-                      Valider modification
+                      Modifier mon message
                     </button>
                   </div>
                 </div>
               )}
             </div>
-            <div className="postContent-image">
-              {post.media && (
-                <img src={post.media} alt="post_image" className="card-img" />
-              )}
-            </div>
+
+            {isUpdated === false && (
+              <div className="postContent-image">
+                {post.media && (
+                  <img src={post.media} alt="post_image" className="card-img" />
+                )}
+              </div>
+            )}
+
+            {isUpdated && (
+              <div className="update-post">
+                <div className="postContent-image">
+                  {post.media ? (
+                    <div className="imageArea">
+                      {post.media && (
+                        <img
+                          src={post.media}
+                          alt="post_image"
+                          className="card-img"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="addImg"></div>
+                  )}
+
+                  <div className="rBlock">
+                    <div className="input_btn">
+                      <input
+                        type="file"
+                        id="file-upload"
+                        name="media"
+                        accept=".jpg, .jpeg, .png"
+                        onChange={(e) => handlePicture(e)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="button-container">
+                  {media && (
+                    <button className="btn" onClick={updateImg}>
+                      Modifier l'image
+                    </button>
+                  )}
+                  {post.media && (
+                    <button
+                      className="btn-delete-pic"
+                      onClick={(e) => {
+                        setMedia(" ");
+                        deleteImg();
+                      }}
+                    >
+                      X
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="postContent-video">
               {post.video && (
                 <iframe
