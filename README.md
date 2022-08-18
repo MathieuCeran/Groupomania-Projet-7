@@ -20,11 +20,13 @@ Dans le terminal de VSCODE, situez-vous dans le dossier ` /backend.`
 
 Démarrer `npm install` pour installer toutes les dependencies du backend.
 
-Dans le fichier `.env`, veuillez rentrer le host, les identifiants de votre utilisateur admin et le nom de la base de données que vous souhaitez créer.
+Dans le fichier `.env`, veuillez rentrer le host, user, mot de passe, et renseigner DB_NAME sur `locale`.
 
 Créer le dossier `upload` dans `backend -> images `
 
-Puis lancer le serveur avec la commande `npm start` nodemon est initier avec cette commande dans le script directement
+Lancer Xampp et créer une nouvelle base au nom de : `locale`
+
+Puis lancer le serveur avec la commande `npm start` nodemon est initier avec cette commande dans le script directement, Sequelize va se charger de créer les tables automatiquement dans la base `locale`.
 
 ### FRONTEND
 
