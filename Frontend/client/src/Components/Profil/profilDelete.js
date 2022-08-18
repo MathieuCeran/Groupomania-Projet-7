@@ -24,21 +24,14 @@ const ProfilDelete = () => {
     if (window === undefined) Cookie.remove(key, { expires: 1 });
   };
 
-  const handleDeleteForm = async (e) => {
-    e.preventDefault();
-
+  const handleDeleteForm = async () => {
     await axios({
       method: "delete",
       url: `${process.env.REACT_APP_API_URL}/api/user/` + id,
       withCredentials: true,
     })
       .then(() => {
-        if (isAdmin) {
-          window.location.reload();
-        } else {
-          removeCookie("jwt");
-          window.location.reload();
-        }
+        removeCookie("jwt");
       })
       .catch((err) => console.log(err));
   };
@@ -46,7 +39,15 @@ const ProfilDelete = () => {
   return (
     <>
       {isAdmin || uid + "" === id ? (
-        <form action="" className="input_media" onSubmit={handleDeleteForm}>
+        <form
+          action=""
+          className="input_media"
+          onSubmit={() => {
+            if (window.confirm("Voulez-vous supprimer le compte ?")) {
+              handleDeleteForm();
+            }
+          }}
+        >
           <br />
           <input type="submit" className="submit" value="Supprimer le compte" />
         </form>
